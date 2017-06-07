@@ -21,5 +21,48 @@
       <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/org.apache.tomcat/servlet-api -->
+	<dependency>
+	    <groupId>org.apache.tomcat</groupId>
+	    <artifactId>servlet-api</artifactId>
+	    <version>6.0.53</version>
+	</dependency>
+    <!-- https://mvnrepository.com/artifact/org.apache.tomcat/tomcat-coyote -->
+	<dependency>
+	    <groupId>org.apache.tomcat</groupId>
+	    <artifactId>tomcat-coyote</artifactId>
+	    <version>7.0.27</version>
+	</dependency>
+	<!-- https://mvnrepository.com/artifact/org.apache.tomcat/tomcat-catalina -->
+	<dependency>
+	    <groupId>org.apache.tomcat</groupId>
+	    <artifactId>tomcat-catalina</artifactId>
+	    <version>8.0.44</version>
+	</dependency>
+	<!-- https://mvnrepository.com/artifact/log4j/log4j -->
+	<dependency>
+	    <groupId>log4j</groupId>
+	    <artifactId>log4j</artifactId>
+	    <version>1.2.17</version>
+	</dependency>
+	
   </dependencies>
+  
+  <build>
+    <finalName>tiny-tomcat</finalName>
+    <plugins>
+      <!-- 指定maven使用jre版本为1.8，不指定每次update maven都会降为最低版本 -->
+      <plugin>
+        <version>3.1</version>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+          <encoding>UTF-8</encoding>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
