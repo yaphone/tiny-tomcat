@@ -21,24 +21,6 @@
       <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
-    <!-- https://mvnrepository.com/artifact/org.apache.tomcat/servlet-api -->
-	<dependency>
-	    <groupId>org.apache.tomcat</groupId>
-	    <artifactId>servlet-api</artifactId>
-	    <version>6.0.53</version>
-	</dependency>
-    <!-- https://mvnrepository.com/artifact/org.apache.tomcat/tomcat-coyote -->
-	<dependency>
-	    <groupId>org.apache.tomcat</groupId>
-	    <artifactId>tomcat-coyote</artifactId>
-	    <version>7.0.27</version>
-	</dependency>
-	<!-- https://mvnrepository.com/artifact/org.apache.tomcat/tomcat-catalina -->
-	<dependency>
-	    <groupId>org.apache.tomcat</groupId>
-	    <artifactId>tomcat-catalina</artifactId>
-	    <version>8.0.44</version>
-	</dependency>
 	<!-- https://mvnrepository.com/artifact/log4j/log4j -->
 	<dependency>
 	    <groupId>log4j</groupId>
