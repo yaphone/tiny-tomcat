@@ -244,7 +244,7 @@ public class Catalina {
 	}
 
 	public void await() {
-
+		log.info("Catalina await");
 		getServer().await();
 
 	}
