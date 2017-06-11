@@ -24,7 +24,7 @@ public class Catalina {
 	protected boolean await = false;
 	protected boolean useShutdownHook = true;
 
-	protected String configFile = "conf/server.xml";
+	protected String configFile = "resources/conf/server.xml";
 
 	public Catalina() {
 
@@ -58,50 +58,9 @@ public class Catalina {
 					log.debug("catalina.configFail", e);
 				}
 			}
-			if (inputStream == null) {
-				try {
-					inputStream = getClass().getClassLoader().getResourceAsStream(getConfigFile());
-					inputSource = new InputSource(getClass().getClassLoader().getResource(getConfigFile()).toString());
-				} catch (Exception e) {
-					if (log.isDebugEnabled()) {
-						log.debug("catalina.configFail", e);
-					}
-				}
-			}
-
-			if (inputStream == null) {
-				try {
-					inputStream = getClass().getClassLoader().getResourceAsStream("server-embed.xml");
-					inputSource = new InputSource(
-							getClass().getClassLoader().getResource("server-embed.xml").toString());
-				} catch (Exception e) {
-					if (log.isDebugEnabled()) {
-						log.debug("catalina.configFail", "server-embed.xml", e);
-					}
-				}
-			}
-
-			if (inputStream == null) {
-				try {
-					inputStream = getClass().getClassLoader().getResourceAsStream("server-embed.xml");
-					inputSource = new InputSource(
-							getClass().getClassLoader().getResource("server-embed.xml").toString());
-				} catch (Exception e) {
-					if (log.isDebugEnabled()) {
-						log.debug("catalina.configFail", "server-embed.xml", e);
-					}
-				}
-			}
 
 			if (inputStream == null || inputSource == null) {
-				if (file == null) {
-					log.warn("catalina.configFail", getConfigFile() + "] or [server-embed.xml]");
-				} else {
-					log.warn("catalina.configFail", file.getAbsolutePath());
-					if (file.exists() && !file.canRead()) {
-						log.warn("Permissions incorrect, read permission is not allowed on the file.");
-					}
-				}
+
 				return;
 			}
 
@@ -224,6 +183,9 @@ public class Catalina {
 	}
 
 	protected File configFile() {
+		log.info("************************");
+		log.info(Bootstrap.getCatalinaBase());
+		log.info("*************************");
 
 		File file = new File(configFile);
 		if (!file.isAbsolute()) {
