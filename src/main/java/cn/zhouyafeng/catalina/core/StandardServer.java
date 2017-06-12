@@ -26,6 +26,13 @@ public class StandardServer extends LifecycleMBeanBase implements Server {
 
 	private static Logger log = LoggerFactory.getLogger(StandardServer.class);
 
+	private final Object serviceLock = new Object();
+
+	private Catalina catalina = null;
+	private File catalinaHome = null;
+	private File catalinaBase = null;
+	private Service services[] = new Service[0];
+
 	private int port = 8005;
 	private volatile Thread awaitThread = null;
 	private volatile boolean stopAwait = false;
@@ -33,12 +40,6 @@ public class StandardServer extends LifecycleMBeanBase implements Server {
 	private String address = "localhost";
 	private String shutdown = "SHUTDOWN";
 	private Random random = null;
-
-	@Override
-	public void init() throws LifecycleException {
-		// TODO Auto-generated method stub
-
-	}
 
 	@Override
 	public NamingResourcesImpl getGlobalNamingResources() {
@@ -114,8 +115,7 @@ public class StandardServer extends LifecycleMBeanBase implements Server {
 
 	@Override
 	public void setCatalina(Catalina catalina) {
-		// TODO Auto-generated method stub
-
+		this.catalina = catalina;
 	}
 
 	@Override
@@ -126,8 +126,7 @@ public class StandardServer extends LifecycleMBeanBase implements Server {
 
 	@Override
 	public void setCatalinaBase(File catalinaBase) {
-		// TODO Auto-generated method stub
-
+		this.catalinaBase = catalinaBase;
 	}
 
 	@Override
@@ -138,13 +137,25 @@ public class StandardServer extends LifecycleMBeanBase implements Server {
 
 	@Override
 	public void setCatalinaHome(File catalinaHome) {
-		// TODO Auto-generated method stub
-
+		this.catalinaHome = catalinaHome;
 	}
 
 	@Override
 	public void addService(Service service) {
-		// TODO Auto-generated method stub
+		service.setServer(this);
+		synchronized (serviceLock) {
+			Service results[] = new Service[services.length + 1];
+			System.arraycopy(services, 0, results, 0, services.length);
+			results[services.length] = service;
+			services = results;
+
+			if (getState().isAvailable()) {
+				try {
+					service.start();
+				} catch (LifecycleException e) {
+				}
+			}
+		}
 
 	}
 
@@ -302,9 +313,20 @@ public class StandardServer extends LifecycleMBeanBase implements Server {
 	}
 
 	@Override
-	protected void startInternal() throws LifecycleException {
-		// TODO Auto-generated method stub
+	protected void initInternal() throws LifecycleException {
+		super.initInternal();
+		for (int i = 0; i < services.length; i++) {
+			services[i].init();
+		}
+	};
 
+	@Override
+	protected void startInternal() throws LifecycleException {
+		synchronized (serviceLock) {
+			for (int i = 0; i < services.length; i++) {
+				services[i].start();
+			}
+		}
 	}
 
 	@Override

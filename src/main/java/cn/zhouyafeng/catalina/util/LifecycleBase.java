@@ -43,6 +43,23 @@ public abstract class LifecycleBase implements Lifecycle {
 	}
 
 	@Override
+	public final synchronized void init() throws LifecycleException {
+		if (!state.equals(LifecycleState.NEW)) {
+			invalidTransition(Lifecycle.BEFORE_INIT_EVENT);
+		}
+
+		try {
+			setStateInternal(LifecycleState.INITIALIZING, null, false);
+			// initInternal();
+			setStateInternal(LifecycleState.INITIALIZED, null, false);
+		} catch (Throwable t) {
+			ExceptionUtils.handleThrowable(t);
+			setStateInternal(LifecycleState.FAILED, null, false);
+			throw new LifecycleException("lifecycleBase.initFail", t);
+		}
+	}
+
+	@Override
 	public final synchronized void start() throws LifecycleException {
 		if (LifecycleState.STARTING_PREP.equals(state) || LifecycleState.STARTING.equals(state)
 				|| LifecycleState.STARTED.equals(state)) {

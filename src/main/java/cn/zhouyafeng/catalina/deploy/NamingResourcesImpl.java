@@ -12,12 +12,6 @@ import cn.zhouyafeng.tomcat.util.descriptor.web.NamingResources;
 public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializable, NamingResources {
 
 	@Override
-	public void init() throws LifecycleException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	public void addEnvironment(ContextEnvironment ce) {
 		// TODO Auto-generated method stub
 

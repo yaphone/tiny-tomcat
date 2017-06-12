@@ -1,20 +1,17 @@
 package cn.zhouyafeng.catalina.startup;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 
 import org.apache.commons.digester.Digester;
 import org.apache.tomcat.util.log.SystemLogHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXParseException;
 
 import cn.zhouyafeng.catalina.LifecycleException;
 import cn.zhouyafeng.catalina.Server;
 import cn.zhouyafeng.catalina.core.StandardServer;
+import cn.zhouyafeng.catalina.core.StandardService;
+import cn.zhouyafeng.catalina.deploy.NamingResourcesImpl;
 
 public class Catalina {
 
@@ -24,89 +21,41 @@ public class Catalina {
 	protected boolean await = false;
 	protected boolean useShutdownHook = true;
 
-	protected String configFile = "resources/conf/server.xml";
+	protected String configFile = "conf/server.xml";
 
 	public Catalina() {
 
 	}
 
 	public void load() {
-		this.server = new StandardServer();
 
-	}
-
-	public void load(String[] args) {
 		long t1 = System.nanoTime();
 
-		initDirs();
-
-		initNaming();
-
-		Digester digester = createStartDigester();
-
-		InputSource inputSource = null;
-		InputStream inputStream = null;
-		File file = null;
-
-		try {
-			try {
-				file = configFile();
-				inputStream = new FileInputStream(file);
-				inputSource = new InputSource(file.toURI().toURL().toString());
-			} catch (Exception e) {
-				if (log.isDebugEnabled()) {
-					log.debug("catalina.configFail", e);
-				}
-			}
-
-			if (inputStream == null || inputSource == null) {
-
-				return;
-			}
-
-			try {
-				inputSource.setByteStream(inputStream);
-				digester.push(this);
-				digester.parse(inputSource);
-			} catch (SAXParseException spe) {
-				log.warn("Catalina.start using " + getConfigFile() + ": " + spe.getMessage());
-				return;
-			} catch (Exception e) {
-				log.warn("Catalina.start using " + getConfigFile() + ": ", e);
-				return;
-			}
-		} finally {
-			if (inputStream != null) {
-				try {
-					inputStream.close();
-				} catch (IOException e) {
-					// Ignore
-				}
-			}
-		}
-
+		// this.server = new StandardServer();
+		createStartDigester();
 		getServer().setCatalina(this);
 		getServer().setCatalinaHome(Bootstrap.getCatalinaHomeFile());
 		getServer().setCatalinaBase(Bootstrap.getCatalinaBaseFile());
 
-		// Stream redirection
 		initStreams();
 
-		// Start the new server
 		try {
 			getServer().init();
 		} catch (LifecycleException e) {
-			if (Boolean.getBoolean("org.apache.catalina.startup.EXIT_ON_INIT_FAILURE")) {
-				throw new java.lang.Error(e);
-			} else {
-				log.error("Catalina.start", e);
-			}
+			// TODO
+			log.error("Catalina load() error");
 		}
 
 		long t2 = System.nanoTime();
+
 		if (log.isInfoEnabled()) {
 			log.info("Initialization processed in " + ((t2 - t1) / 1000000) + " ms");
 		}
+
+	}
+
+	public void load(String[] args) {
+
 	}
 
 	public void start() {
@@ -178,14 +127,14 @@ public class Catalina {
 
 	protected Digester createStartDigester() {
 		long t1 = System.currentTimeMillis();
-		// Initialize the digester
+		this.server = new StandardServer();
+		server.setGlobalNamingResources(new NamingResourcesImpl());
+		// TODO server.addListener(new LifecycleListener());
+		server.addService(new StandardService());
 		return null;
 	}
 
 	protected File configFile() {
-		log.info("************************");
-		log.info(Bootstrap.getCatalinaBase());
-		log.info("*************************");
 
 		File file = new File(configFile);
 		if (!file.isAbsolute()) {
