@@ -1,13 +1,16 @@
 package cn.zhouyafeng.catalina.core;
 
 import java.beans.PropertyChangeSupport;
+import java.util.ArrayList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cn.zhouyafeng.catalina.Container;
 import cn.zhouyafeng.catalina.Engine;
+import cn.zhouyafeng.catalina.Executor;
 import cn.zhouyafeng.catalina.LifecycleException;
+import cn.zhouyafeng.catalina.LifecycleState;
 import cn.zhouyafeng.catalina.Server;
 import cn.zhouyafeng.catalina.Service;
 import cn.zhouyafeng.catalina.util.LifecycleMBeanBase;
@@ -23,6 +26,10 @@ public class StandardService extends LifecycleMBeanBase implements Service {
 
 	protected Container container = null;
 
+	protected final ArrayList<Executor> executors = new ArrayList<>();
+
+	private final Object connectorsLock = new Object();
+
 	@Override
 	protected String getDomainInternal() {
 		// TODO Auto-generated method stub
@@ -37,8 +44,33 @@ public class StandardService extends LifecycleMBeanBase implements Service {
 
 	@Override
 	protected void startInternal() throws LifecycleException {
-		// TODO Auto-generated method stub
+		if (log.isInfoEnabled())
+			log.info("standardService.start.name", this.name);
+		setState(LifecycleState.STARTING);
 
+		if (container != null) {
+			synchronized (container) {
+				container.start();
+			}
+		}
+
+		synchronized (executors) {
+			for (Executor executor : executors) {
+				executor.start();
+			}
+		}
+		synchronized (connectorsLock) {
+			// for (Connector connector : connectors) {
+			// try {
+			// // If it has already failed, don't try and start it
+			// if (connector.getState() != LifecycleState.FAILED) {
+			// connector.start();
+			// }
+			// } catch (Exception e) {
+			// log.error("standardService.connector.startFailed", connector, e);
+			// }
+			// }
+		}
 	}
 
 	@Override
