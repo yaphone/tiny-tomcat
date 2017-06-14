@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import cn.zhouyafeng.catalina.LifecycleException;
+import cn.zhouyafeng.catalina.LifecycleState;
 import cn.zhouyafeng.catalina.Server;
 import cn.zhouyafeng.catalina.Service;
 import cn.zhouyafeng.catalina.deploy.NamingResourcesImpl;
@@ -322,6 +323,10 @@ public class StandardServer extends LifecycleMBeanBase implements Server {
 
 	@Override
 	protected void startInternal() throws LifecycleException {
+
+		fireLifecycleEvent(CONFIGURE_START_EVENT, null);
+		setState(LifecycleState.STARTING);
+
 		synchronized (serviceLock) {
 			for (int i = 0; i < services.length; i++) {
 				services[i].start();
