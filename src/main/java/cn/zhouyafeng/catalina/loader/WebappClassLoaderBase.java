@@ -70,6 +70,15 @@ public class WebappClassLoaderBase extends URLClassLoader implements Lifecycle {
 			checkStateForClassLoading(name);
 
 			clazz = findLoadedClass0(name);
+			if (clazz != null) {
+				if (log.isDebugEnabled()) {
+					log.debug("  Returning class from cache");
+				}
+				if (resolve) {
+					resolveClass(clazz);
+				}
+				return clazz;
+			}
 		}
 	}
 
