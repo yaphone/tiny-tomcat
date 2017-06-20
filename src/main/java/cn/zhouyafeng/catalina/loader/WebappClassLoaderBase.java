@@ -21,6 +21,8 @@ public class WebappClassLoaderBase extends URLClassLoader implements Lifecycle {
 
 	private ClassLoader javaseClassLoader;
 
+	private static final String CLASS_FILE_SUFFIX = ".class";
+
 	protected WebappClassLoaderBase() {
 		super(new URL[0]);
 
@@ -155,6 +157,28 @@ public class WebappClassLoaderBase extends URLClassLoader implements Lifecycle {
 	public String getStateName() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	protected Class<?> findLoadedClass0(String name) {
+
+		String path = binaryNameToPath(name, true);
+
+		ResourceEntry entry = resourceEntries.get(path);
+		if (entry != null) {
+			return entry.loadedClass;
+		}
+		return null;
+	}
+
+	private String binaryNameToPath(String binaryName, boolean withLeadingSlash) {
+		// 1 for leading '/', 6 for ".class"
+		StringBuilder path = new StringBuilder(7 + binaryName.length());
+		if (withLeadingSlash) {
+			path.append('/');
+		}
+		path.append(binaryName.replace('.', '/'));
+		path.append(CLASS_FILE_SUFFIX);
+		return path.toString();
 	}
 
 }
